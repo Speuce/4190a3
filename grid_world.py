@@ -6,6 +6,8 @@ from color import Color
 class GridWorld:
     def __init__(self, grid, start_x, start_y, noise, transition_cost, discount):
         self.grid = grid
+        self.start_x = start_x
+        self.start_y = start_y
         self.agent_x = start_x
         self.agent_y = start_y
         self.noise = noise
@@ -38,8 +40,11 @@ class GridWorld:
     def is_satisfied(self):
         return isinstance(self.grid[self.agent_y][self.agent_x], ExitCell)
 
-    def reset(self):
-        self.set_position(*self.choose_random_empty_cell())
+    def reset(self, random=False):
+        if random:
+            self.set_position(*self.choose_random_empty_cell())
+        else:
+            self.set_position(self.start_x, self.start_y)
 
     # sets the agents position
     def set_position(self, x, y):
@@ -52,13 +57,13 @@ class GridWorld:
     # determines if an action is possible
     def can_move(self, action:Action):
         if action == Action.UP:
-            return self.agent_y > 0
+            return self.agent_y > 0 and not isinstance(self.grid[self.agent_y - 1][self.agent_x], BoulderCell)
         elif action == Action.DOWN:
-            return self.agent_y < len(self.grid) - 1
+            return self.agent_y < len(self.grid) - 1 and not isinstance(self.grid[self.agent_y + 1][self.agent_x], BoulderCell)
         elif action == Action.LEFT:
-            return self.agent_x > 0
+            return self.agent_x > 0 and not isinstance(self.grid[self.agent_y][self.agent_x - 1], BoulderCell)
         elif action == Action.RIGHT:
-            return self.agent_x < len(self.grid[0]) - 1
+            return self.agent_x < len(self.grid[0]) - 1 and not isinstance(self.grid[self.agent_y][self.agent_x + 1], BoulderCell)
 
     # perturbs and returns and action according to noise
     def peturb_action(self, action):
@@ -83,7 +88,7 @@ class GridWorld:
         if has_noise and rand.uniform(0, 1) <= self.noise:
             action = self.peturb_action(action)
         if not self.can_move(action):
-            # print("Can't make move")
+            print("Can't make move")
             action = Action.NOPE
         # print(action)
         # print(self.agent_x, self.agent_y)

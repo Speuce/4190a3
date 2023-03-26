@@ -3,7 +3,7 @@ from typing import Dict, List, Tuple
 from grid_world import GridWorld
 from cell import EmptyCell, ExitCell, BoulderCell, GridItem
 
-file_name = "grid.txt" # change this to the name of your file
+file_name = "grid_2.txt" # change this to the name of your file
 
 def parse_terminal_boulder_line(line):
     data = line.strip("{}\n")

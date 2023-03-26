@@ -7,7 +7,7 @@ import random as rand
 import reader
 
 def getQValue(grid_world, x, y):
-    grid_world.get_q_values(x, y)
+    return grid_world.get_q_values(x, y)
 
 def getValue(grid_world, x, y):
     q_values = getQValue(grid_world, x, y)
@@ -41,21 +41,26 @@ def get_policy(grid_world, x, y):
     return rand.choice(best_choices)
 
 def iterate(grid_world: GridWorld, eps: int, alpha: float):
-    eps = 10
+    eps = 10000
+    print("Start")
+    printgrid(grid_world)
     for i in range(eps):
         print("Iteration: " + str(i))
         action = get_policy(grid_world, grid_world.agent_x, grid_world.agent_y)
+        # print("Going " + str(action))
+        print(grid_world.get_q_values(*grid_world.get_position()))
+        x, y = grid_world.get_position()
         reward = grid_world.take_action(action, has_noise=True, use_true_value=False)
-        update(grid_world, grid_world.agent_x, grid_world.agent_y, action, reward, alpha)
-        printgrid(grid_world)
+        update(grid_world, x, y, action, reward, alpha)
         if grid_world.is_satisfied():
             x, y = grid_world.get_position()
             reward = grid_world.grid[y][x].value
             grid_world.update_known_value(x, y, reward)
-            grid_world.reset()
+            grid_world.reset(random=True)
+        printgrid(grid_world)
 
 def _print_cell_value_with_arrow(grid_world, x, y, actions):
-    val = grid_world.grid[y][x].value
+    val = grid_world.grid[y][x].known_value
     absval = abs(val)
     if Action.LEFT in actions:
         print('<', end='')
@@ -83,18 +88,19 @@ def _print_cell_value_with_arrow(grid_world, x, y, actions):
 
 def printgrid(grid_world):
     for y in range(len(grid_world.grid)):
-        actions = get_best_choices(grid_world, x, y)
         grid_world._print_grid_line()
         for x in range(len(grid_world.grid[y])):
-            if Action.UP in actions:
+            actions = get_best_choices(grid_world, x, y)
+            if Action.UP in actions and grid_world.grid[y][x].can_move:
                 print('|    ^    ', end='')
             else:
                 print('|         ', end='')
         print('|')
         for x in range(len(grid_world.grid[y])):
+            actions = get_best_choices(grid_world, x, y)
             print('|', end='')
             if x == grid_world.agent_x and y == grid_world.agent_y:
-                print(Color.UNDERLINE)
+                print(Color.UNDERLINE, end='')
             if isinstance(grid_world.grid[y][x], ExitCell):
                 _print_cell_value_with_arrow(grid_world, x, y, actions)
             elif not grid_world.grid[y][x].can_move:
@@ -103,10 +109,12 @@ def printgrid(grid_world):
                 _print_cell_value_with_arrow(grid_world, x, y, actions)
         print('|')
         for x in range(len(grid_world.grid[y])):
-            if Action.DOWN in actions:
+            actions = get_best_choices(grid_world, x, y)
+            if Action.DOWN in actions and grid_world.grid[y][x].can_move:
                 print('|    v    ', end='')
             else:
                 print('|         ', end='')
+        print('|')
     grid_world._print_grid_line()
 
                     
@@ -115,7 +123,8 @@ def printgrid(grid_world):
 
 if __name__ == '__main__':
     os.system('color')
-    (grid, _, eps, a) = reader.read_grid("grid.txt")
+    rand.seed(0)
+    (grid, _, eps, a) = reader.read_grid("grid_2.txt")
     iterate(grid, eps, a)
 
 
