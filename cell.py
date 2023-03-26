@@ -10,13 +10,19 @@ class GridItem(ABC):
         self.y = y
         self.can_move=can_move
         self.value = value
+        self.known_value = 0
         self.q_values = {Action.UP: 0, Action.DOWN: 0, Action.LEFT: 0, Action.RIGHT: 0}
 
-    # @abstractmethod
     def update_value(self, value):
         if value is None:
             raise ValueError("Value cannot be None")
         self.value = value
+
+    def update_known_value(self, value):
+        if value is None:
+            raise ValueError("Value cannot be None")
+        self.known_value = value
+
 
 
 class BoulderCell(GridItem):
