@@ -41,14 +41,14 @@ def get_policy(grid_world, x, y):
     return rand.choice(best_choices)
 
 def iterate(grid_world: GridWorld, eps: int, alpha: float):
-    eps = 10000
+    eps = 100000
     print("Start")
-    printgrid(grid_world)
+    printgridqvals(grid_world)
     for i in range(eps):
-        print("Iteration: " + str(i))
+        # print("Iteration: " + str(i))
         action = get_policy(grid_world, grid_world.agent_x, grid_world.agent_y)
         # print("Going " + str(action))
-        print(grid_world.get_q_values(*grid_world.get_position()))
+        # print(grid_world.get_q_values(*grid_world.get_position()))
         x, y = grid_world.get_position()
         reward = grid_world.take_action(action, has_noise=True, use_true_value=False)
         update(grid_world, x, y, action, reward, alpha)
@@ -57,7 +57,8 @@ def iterate(grid_world: GridWorld, eps: int, alpha: float):
             reward = grid_world.grid[y][x].value
             grid_world.update_known_value(x, y, reward)
             grid_world.reset(random=True)
-        printgrid(grid_world)
+        # printgridqvals(grid_world)
+    printgridqvals(grid_world)
 
 def _print_cell_value_with_arrow(grid_world, x, y, actions):
     val = grid_world.grid[y][x].known_value
@@ -116,6 +117,45 @@ def printgrid(grid_world):
                 print('|         ', end='')
         print('|')
     grid_world._print_grid_line()
+
+def _print_value(val):
+    absval = abs(val)
+    if(val == 0):
+        print(' ', end='')
+    elif val > 0:
+        print(str(Color.GREEN) + " ", end='')
+    else:
+        print(Color.RED, end='')
+    print("{:1.2f}".format(val), end='')
+    print(Color.END, end='')
+
+def _print_grid_line(grid_world):
+    for x in range(len(grid_world.grid[0])):
+        print('+-----------', end='')
+    print('+')
+
+def printgridqvals(grid_world):
+    for y in range(len(grid_world.grid)):
+        _print_grid_line(grid_world)
+        for x in range(len(grid_world.grid[y])):
+            print('|   ', end='')
+            _print_value(getQValue(grid_world, x, y)[Action.UP])
+            print('   ', end='')
+        print('|')
+        for x in range(len(grid_world.grid[y])):
+            if x == grid_world.agent_x and y == grid_world.agent_y:
+                print(Color.UNDERLINE, end='')
+            print('|', end='')
+            _print_value(getQValue(grid_world, x, y)[Action.LEFT])
+            print(' ', end='')
+            _print_value(getQValue(grid_world, x, y)[Action.RIGHT])
+        print('|')
+        for x in range(len(grid_world.grid[y])):
+            print('|   ', end='')
+            _print_value(getQValue(grid_world, x, y)[Action.DOWN])
+            print('   ', end='')
+        print('|')
+    _print_grid_line(grid_world)
 
                     
 
