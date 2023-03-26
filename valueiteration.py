@@ -1,3 +1,4 @@
+import os
 from grid_world import GridWorld
 from action import Action
 import reader
@@ -19,6 +20,7 @@ def iterate(grid_world: GridWorld, k: int):
 
 
 if __name__ == '__main__':
+    os.system('color')
     (grid, k, _, _) = reader.read_grid("grid.txt")
     iterate(grid, 10)
 
