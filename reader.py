@@ -65,8 +65,7 @@ def read_grid(file: str) -> Tuple[GridWorld, int, int, int]:
     config = read_values_from_file(file_name)
     grid = build_grid(config["Horizontal"], config["Vertical"], config["Terminal"], config["Boulder"])
     start_x, start_y = config["RobotStartState"]
-    # noise = config["Noise"]
-    noise = 0
+    noise = config["Noise"]
     transition_cost = config["TransitionCost"]
     discount = config["Discount"]
     depth = config["K"]

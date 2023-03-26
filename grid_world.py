@@ -12,11 +12,11 @@ class GridWorld:
         self.transition_cost = transition_cost
         self.discount = discount
         self.action_to_index = {
-            Action.UP: (0, -1),
-            Action.DOWN: (0, 1),
-            Action.LEFT: (-1, 0),
-            Action.RIGHT: (1, 0),
-            Action.NOPE: (0, 0)
+            Action.UP.value: (0, -1),
+            Action.DOWN.value: (0, 1),
+            Action.LEFT.value: (-1, 0),
+            Action.RIGHT.value: (1, 0),
+            Action.NOPE.value: (0, 0)
         }
         self.action_noises = {
             Action.UP: [Action.LEFT, Action.RIGHT], 
@@ -47,14 +47,16 @@ class GridWorld:
         action = rand.choice(self.action_noises[action])
         return action
 
-    def get_weighted_action_reward(self, action):
+    def get_weighted_action_reward(self, desired_action):
         cur_x = self.agent_x 
         cur_y = self.agent_y
         reward = 0
-        for action in self.action_noises[action]:
+        for action in self.action_noises[desired_action]:
+            # print("Trying noisy action: " + str(action))
             reward += self.take_action(action)*self.noise/2
             self.set_position(cur_x, cur_y)
-        reward += self.take_action(action)*(1-self.noise)
+        # print("Trying desired action: " + str(desired_action))
+        reward += self.take_action(desired_action)*(1-self.noise)
         self.set_position(cur_x, cur_y)
         return reward
 
@@ -63,19 +65,24 @@ class GridWorld:
         if has_noise and rand.uniform(0, 1) <= self.noise:
             action = self.peturb_action(action)
         if not self.can_move(action):
+            # print("Can't make move")
             action = Action.NOPE
-        self.agent_x += self.action_to_index[action][0]
-        self.agent_y += self.action_to_index[action][1]
+        # print(action)
+        # print(self.agent_x, self.agent_y)
+        self.agent_x += self.action_to_index[action.value][0]
+        self.agent_y += self.action_to_index[action.value][1]
+        # print("Agent moved to: (" + str(self.agent_x) + ", " + str(self.agent_y) + ")")
         reward = self.transition_cost 
         # TODO check this is right later, is exist reward part of reward for transition or part of value of state?
         if isinstance(self.grid[self.agent_y][self.agent_x], ExitCell):
             reward += self.grid[self.agent_y][self.agent_x].value
+            # print("Exit state reached!")
         else: 
             reward += self.grid[self.agent_y][self.agent_x].value * self.discount
         return reward 
 
     def update_value(self, x, y, value):
-        self.grid[x][y].update_value(value)
+        self.grid[y][x].update_value(value)
 
     def _print_grid_line(self):
         for x in range(len(self.grid[0])):
