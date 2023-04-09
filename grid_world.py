@@ -146,7 +146,7 @@ class GridWorld:
         for action in [Action.UP, Action.DOWN, Action.RIGHT, Action.LEFT]:
             self.set_position(pos_x, pos_y)
             if self.can_move(action):
-                cur_score = self.take_action(action, False, True)
+                cur_score = self.get_weighted_action_reward(action)
                 if best_action is None or cur_score > best_score:
                     best_action = action
                     best_score = cur_score
