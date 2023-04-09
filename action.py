@@ -1,3 +1,8 @@
+"""
+action.py
+Enum class for different actions
+"""
+
 from enum import Enum
 
 class Action(Enum):

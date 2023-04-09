@@ -1,3 +1,7 @@
+
+"""
+Utility Class for printing colored text to the terminal.
+"""
 from enum import Enum
 
 class Color(Enum):
