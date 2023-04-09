@@ -176,20 +176,34 @@ def printgridqvals(grid_world):
         _print_grid_line(grid_world)
         for x in range(len(grid_world.grid[y])):
             print('|   ', end='')
-            _print_value(getQValue(grid_world, x, y)[Action.UP])
+            if grid_world.grid[y][x].can_move:
+                _print_value(getQValue(grid_world, x, y)[Action.UP])
+            else:
+                print('     ', end='')
             print('   ', end='')
         print('|')
         for x in range(len(grid_world.grid[y])):
             if PRINT_AGENT and x == grid_world.agent_x and y == grid_world.agent_y:
                 print(Color.UNDERLINE, end='')
             print('|', end='')
-            _print_value(getQValue(grid_world, x, y)[Action.LEFT])
-            print(' ', end='')
-            _print_value(getQValue(grid_world, x, y)[Action.RIGHT])
+            if not grid_world.grid[y][x].can_move:
+                if isinstance(grid_world.grid[y][x], ExitCell):
+                    print('  ', end='')
+                    _print_value(grid_world.grid[y][x].value)
+                    print('   ', end='')
+                else:
+                    print('           ', end='')
+            else:
+                _print_value(getQValue(grid_world, x, y)[Action.LEFT])
+                print(' ', end='')
+                _print_value(getQValue(grid_world, x, y)[Action.RIGHT])
         print('|')
         for x in range(len(grid_world.grid[y])):
             print('|   ', end='')
-            _print_value(getQValue(grid_world, x, y)[Action.DOWN])
+            if grid_world.grid[y][x].can_move:
+                _print_value(getQValue(grid_world, x, y)[Action.DOWN])
+            else:
+                print('     ', end='')
             print('   ', end='')
         print('|')
     _print_grid_line(grid_world)
